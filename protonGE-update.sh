@@ -4,10 +4,13 @@
 # https://github.com/GloriousEggroll/proton-ge-custom
 
 ######################################################################################## vars
-# noGEproton - there are no proton files found, whether no working dir or files within
-# latest_GE  - what is the latest protonGE version we have?
-# latest     - do we have the latest version?
-# shaOK      - the checksum passed
+# noGEproton    - there are no proton files found, whether no working dir or files within
+# latest_GE     - what is the latest protonGE version we have?
+# latest        - do we have the latest version?
+# shaOK         - the checksum passed
+# checksumtries - loop counter
+# untarsuccess  - verify the unzip is good or exit
+# exit_state    - useful error messages
 
 me=$(whoami)
 
