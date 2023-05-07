@@ -146,9 +146,9 @@ install_protonGE()
 ######################################################################################## main
 
 # todo -v for what version is installed
-while getopts :h in flag; do 
+while getopts :h flag; do 
   case $flag in
-    h) usage ;;
+    h) usage && exit 1 ;;
   esac
 done
 
