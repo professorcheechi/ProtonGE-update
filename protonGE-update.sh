@@ -23,6 +23,15 @@ comptoolsdir=$myhome/.steam/root/compatibilitytools.d
 protonGE_url=https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest
 
 ######################################################################################## functions
+
+usage()
+{
+  printf "\n\n This script is an expansion and automation of the instructions provided at the Proton GE github page \
+          \n\n https://github.com/GloriousEggroll/proton-ge-custom \
+          \n\n The purpose is to automate the installation steps and if needed help diagnose install isssues. \
+          \n It needs no flags or arguments, the only flag is -h to display this help message \n\n"
+}
+
 exit_clean()
 { # Assumption: any step that fails will provide some output along the way to assist with troubleshooting
   case $exit_state in
@@ -53,12 +62,12 @@ local_files_check()
   # make sure we can write to both dir
 
   #verbose output
-  printf "\n $mydl \n"
+  printf "\n $mydl \n\n"
   ls -lrt $mydl | grep protonGE
 
   ls -lrt $mydl | grep protonGE | grep -q "drwx" || exit_state=4
 
-  printf "\n $comptoolsdir \n"
+  printf "\n $comptoolsdir \n\n"
   ls -lrt $comptoolsdir
 
   ls -lrt $comptoolsdir | grep -q "drwx" || exit_state=4
@@ -71,7 +80,7 @@ local_files_check()
 
   if [[ "$noGEproton" -ne 1 ]]; then
     # if the dir exists but has no file
-    echo "$latest_GE" | egrep -q "tar.gz|sha512sum" || noGEproton=1
+    echo "$latest_GE" | grep -qE "tar.gz|sha512sum" || noGEproton=1
   fi
 }
 
@@ -92,7 +101,7 @@ remote_files_check()
     exit_state=6 && exit_clean $@
   fi
 
-  printf "\n Latest version is $latest_GE \n"
+  printf "\n Latest version is $latest_GE \n\n"
 
   if [[ "$current_GE" -eq "$latest_GE" ]]; then
     latest=1
@@ -102,10 +111,10 @@ remote_files_check()
 get_new_protonGE()
 {
   # download  tarball
-  curl -sLOJ $(curl -s $protonGE_url | grep browser_download_url | cut -d\" -f4 | egrep .tar.gz)
+  curl -sLOJ $(curl -s $protonGE_url | grep browser_download_url | cut -d\" -f4 | grep -E .tar.gz)
 
   # download checksum
-  curl -sLOJ $(curl -s $protonGE_url | grep browser_download_url | cut -d\" -f4 | egrep .sha512sum)
+  curl -sLOJ $(curl -s $protonGE_url | grep browser_download_url | cut -d\" -f4 | grep -E .sha512sum)
 }
 
 check_tarball()
@@ -122,9 +131,9 @@ install_protonGE()
   tar -xf $latest_GE.tar.gz -C "$comptoolsdir" && untarsuccess=1
 
   if [[ "$untarsuccess" -eq 1 ]]; then
-    ls -l "$comptoolsdir/$latest_GE/proton"
+    proton_installed=$(ls -l "$comptoolsdir/$latest_GE/proton")
 
-    if [ -f "$comptoolsdir/$latest_GE/proton" ]; then
+    if [ -f "$proton_installed" ]; then
       printf "\n $latest_GE successfully installed. Please restart Steam \n\n"
     else
       exit_state=2 && exit_clean $@
@@ -135,6 +144,11 @@ install_protonGE()
 }
 
 ######################################################################################## main
+
+while getopts :h in flag; do 
+  case $flag in
+    h) usage ;;
+  esac
 
 local_files_check $@
 
@@ -158,7 +172,7 @@ while (( "$checksumtries" < 3 )) ; do
   fi
 done
 
-if [[ "$checksumtries" -eq 5 ]] ||  [[ "$shaOK" -ne 1 ]]; then
+if [[ "$checksumtries" -eq 3 ]] ||  [[ "$shaOK" -ne 1 ]]; then
   exit_state=5 && exit_clean $@
 else
   install_protonGE $@
