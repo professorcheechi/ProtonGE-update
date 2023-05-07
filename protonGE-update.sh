@@ -145,10 +145,12 @@ install_protonGE()
 
 ######################################################################################## main
 
+# todo -v for what version is installed
 while getopts :h in flag; do 
   case $flag in
     h) usage ;;
   esac
+done
 
 local_files_check $@
 
