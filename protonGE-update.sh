@@ -32,6 +32,20 @@ usage()
           \n It needs no flags or arguments, the only flag is -h to display this help message \n\n"
 }
 
+version_check_only()
+{
+  if [ -d "$comptoolsdir" ]; then
+    # check the existing installed version
+    current_GE=$(ls -lrt $comptoolsdir | grep GE-Proton | tail -1 | awk '{print $NF}')
+    printf "\n Installed version is $current_GE \n"
+  else 
+    printf "\n No Proton GE installed \n\n"
+  fi
+  # check current version available
+  latest_GE=$(curl -s $protonGE_url -- list-only | grep "tag_name" | awk '{print $NF}' | tr -d '",')
+  printf "\n Latest version is $latest_GE \n\n"
+}
+
 exit_clean()
 { # Assumption: any step that fails will provide some output along the way to assist with troubleshooting
   case $exit_state in
@@ -76,11 +90,12 @@ local_files_check()
     exit_clean $@
   fi
 
-  cd $mydl/protonGE
-
+  # this needs to check if there is a file, do we have both tar & sha512sum matching the latest version
+  # and if so skip downloading go straight to the checksum
+  # WIP
   if [[ "$noGEproton" -ne 1 ]]; then
     # if the dir exists but has no file
-    echo "$latest_GE" | grep -qE "tar.gz|sha512sum" || noGEproton=1
+    ls -l $mydl/protonGE | grep -qE "tar.gz|sha512sum" || noGEproton=1
   fi
 }
 
@@ -146,9 +161,10 @@ install_protonGE()
 ######################################################################################## main
 
 # todo -v for what version is installed
-while getopts :h flag; do 
+while getopts :hv flag; do 
   case $flag in
     h) usage && exit 1 ;;
+    v) version_check_only && exit 1 ;;
   esac
 done
 
