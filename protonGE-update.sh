@@ -89,19 +89,12 @@ local_files_check()
   if [ -n "$exit_state" ]; then
     exit_clean $@
   fi
-
-  # this needs to check if there is a file, do we have both tar & sha512sum matching the latest version
-  # and if so skip downloading go straight to the checksum
-  # WIP
-  if [[ "$noGEproton" -ne 1 ]]; then
-    # if the dir exists but has no file
-    ls -l $mydl/protonGE | grep -qE "tar.gz|sha512sum" || noGEproton=1
-  fi
 }
 
 remote_files_check()
-{ # assumption: whatever version is listed on github as current, even if older, we should treat as the one to install.
-  # Should cover if a version is rolled back, we should download & install the current version if different from ours.
+{ # assumption: whatever version is listed on github as current, even if older.
+  # For instance if a version is rolled back there is probably a good reason. 
+  # should download & install the current version available if different from ours.
 
   if [[ -n "$noGEproton" ]]; then
     # check the existing installed version
@@ -109,7 +102,7 @@ remote_files_check()
     printf "\n Installed version is $current_GE \n"
   fi
 
-  # check if newer version
+  # check if newer/different version
   latest_GE=$(curl -s $protonGE_url -- list-only | grep "tag_name" | awk '{print $NF}' | tr -d '",')
 
   if [ -z "$(echo "$latest_GE" | grep -i proton)" ]; then
@@ -121,6 +114,10 @@ remote_files_check()
   if [[ "$current_GE" -eq "$latest_GE" ]]; then
     latest=1
   fi
+  # note: there is not a check if the tar/sha files exist in the download dir
+  # and whether they are the current version. if the script was run prior and failed
+  # these might be the cause, should move forward & download new ones just in case
+  # this script writes no log or other tracking, only interacting with files to ls, download, checksum & untar
 }
 
 get_new_protonGE()
