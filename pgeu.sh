@@ -32,19 +32,19 @@ usage()
           \n It needs no flags or arguments, the only flag is -h to display this help message \n\n"
 }
 
-version_check_only()
-{
-  if [ -d "$comptoolsdir" ]; then
-    # check the existing installed version
-    current_GE=$(ls -lrt $comptoolsdir | grep GE-Proton | tail -1 | awk '{print $9}')
-    printf "\n Installed version is $current_GE \n"
-  else 
-    printf "\n No Proton GE installed \n\n"
-  fi
-  # check current version available
-  latest_GE=$(curl -s $protonGE_url -- list-only | grep "tag_name" | awk '{print $NF}' | tr -d '",')
-  printf "\n Latest version is $latest_GE \n\n"
-}
+#version_check_only()
+#{
+#  if [ -d "$comptoolsdir" ]; then
+#    # check the existing installed version
+#    current_GE=$(ls -lrt $comptoolsdir | grep GE-Proton | tail -1 | awk '{print $9}')
+#    printf "\n Installed version is $current_GE \n"
+#  else 
+#    printf "\n No Proton GE installed \n\n"
+#  fi
+#  # check current version available
+#  latest_GE=$(curl -s $protonGE_url -- list-only | grep "tag_name" | awk '{print $NF}' | tr -d '",')
+#  printf "\n Latest version is $latest_GE \n\n"
+#}
 
 exit_clean()
 { # Assumption: any step that fails will provide some output along the way to assist with troubleshooting
@@ -75,14 +75,18 @@ exit_clean()
 
 local_files_check()
 {
-  # make working directory if needed
-  if ! [ -d $mydl/protonGE ]; then
-    mkdir $mydl/protonGE
+  if [[ "$version_check_only" -ne 1 ]]; then
+    # make working directory if needed
+    if ! [ -d $mydl/protonGE ]; then
+      mkdir $mydl/protonGE
+    fi
   fi
 
   if ! [ -d $comptoolsdir ]; then
-    # make steam directory if it does not exist
-    mkdir -p ~/.steam/root/compatibilitytools.d
+    if [[ "$version_check_only" -ne 1 ]]; then
+      # make steam directory if it does not exist
+      mkdir -p ~/.steam/root/compatibilitytools.d
+    fi 
     noGEproton=1
   fi
 
@@ -101,11 +105,15 @@ local_files_check()
     ls -lrt $comptoolsdir | grep -q "drwx" || exit_state=4
   fi
 
-  if [ -n "$exit_state" ]; then
-    exit_clean $@
+  if [[ "$version_check_only" -ne 1 ]]; then
+    if [ -n "$exit_state" ]; then
+      exit_clean $@
+    else
+      cwd=$(pwd)
+      cd $mydl/protonGE
+    fi
   else
-    cwd=$(pwd)
-    cd $mydl/protonGE
+    exit 1
   fi
 }
 
@@ -183,7 +191,7 @@ install_protonGE()
 while getopts :hv flag; do
   case $flag in
     h) usage && exit 1 ;;
-    v) version_check_only && exit 1 ;;
+    v) version_check_only=1 ;;
   esac
 done
 
