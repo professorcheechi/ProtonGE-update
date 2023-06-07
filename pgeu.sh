@@ -60,14 +60,14 @@ exit_clean()
     3) exit_message="No newer ProtonGE to download" ;;
     4) exit_message="Please check file permissions" ;;
     5) exit_message="3 failed attempts to download & chesksum. Please troubleshoot your system & connection before trying again" ;;
-    6) exit_message="Unable to reach github or bandwitdh restriction attempts fetching latest version info. Please troubleshoot connection or try aga>
+    6) exit_message="Unable to reach github or bandwitdh restriction attempts fetching latest version info. Please troubleshoot connection or try again later" ;;
   esac
 
 ## 
 ## need to update truncated line in case ## 
 ## 
 
-
+Please troubleshoot connection or try again later" ;;
 
   printf "\n Unable to continue, $exit_message \n\n"
   exit $exit_state
