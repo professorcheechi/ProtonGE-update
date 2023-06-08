@@ -63,8 +63,6 @@ exit_clean()
     6) exit_message="Unable to reach github or bandwitdh restriction attempts fetching latest version info. Please troubleshoot connection or try again later" ;;
   esac
 
-Please troubleshoot connection or try again later" ;;
-
   printf "\n Unable to continue, $exit_message \n\n"
   exit $exit_state
 }
