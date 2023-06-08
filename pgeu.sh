@@ -69,35 +69,41 @@ exit_clean()
 
 local_files_check()
 {
-  if [[ "$version_check_only" -ne 1 ]]; then
-    # make working directory if needed
-    if ! [ -d $mydl/protonGE ]; then
+  # make working directory if needed
+  if ! [ -d $mydl/protonGE ]; then
+    noGEproton=1
+    if [[ "$version_check_only" -ne 1 ]]; then
       mkdir $mydl/protonGE
+    else
+      exit_state=7 &&  exit_clean $@
     fi
   fi
 
+  # make steam directory if it does not exist
   if ! [ -d $comptoolsdir ]; then
-    if [[ "$version_check_only" -ne 1 ]]; then
-      # make steam directory if it does not exist
-      mkdir -p ~/.steam/root/compatibilitytools.d
-    fi 
     noGEproton=1
+    if [[ "$version_check_only" -ne 1 ]]; then 
+      mkdir -p ~/.steam/root/compatibilitytools.d
+    else
+      exit_state=7 &&  exit_clean $@
+    fi
   fi
 
   # make sure we can write to both dir
-
-  #verbose output
-  printf "\n $mydl \n\n"
-  ls -lrt $mydl | grep -w "protonGE "
-
-  ls -lrt $mydl | grep -w protonGE | grep -q "drwx" || exit_state=4
-
-  printf "\n $comptoolsdir \n\n"
-  ls -lrt $comptoolsdir
-
   if [[ "$noGEproton" -ne 1 ]]; then
+    ls -lrt $mydl | grep -w protonGE | grep -q "drwx" || exit_state=4
     ls -lrt $comptoolsdir | grep -q "drwx" || exit_state=4
   fi
+
+  # verbose output whether checking or installing files
+  # exit if only checking
+  printf "\n $mydl/protonGE \n\n"
+  dl_files=$(ls -lrt $mydl/protonGE | grep -w "protonGE ")
+  echo "$dl_files" 
+
+  printf "\n $comptoolsdir \n\n"
+  installed_files=$(ls -lrt $comptoolsdir)
+  echo "$installed_files"
 
   if [[ "$version_check_only" -ne 1 ]]; then
     if [ -n "$exit_state" ]; then
@@ -110,6 +116,7 @@ local_files_check()
     exit 1
   fi
 }
+
 
 remote_files_check()
 { # assumption: whatever version is listed on github as current, even if older.
