@@ -3,6 +3,11 @@
 # expanded from instructions here
 # https://github.com/GloriousEggroll/proton-ge-custom
 
+## flatpack version of steam install dir
+# ~/.var/app/com.valvesoftware.Steam/.steam/root/compatibilitytools.d/
+# TODO detect which is installed and choose the proper comptoolsdir
+
+
 ######################################################################################## vars
 # noGEproton    - there are no proton files found, whether no working dir or files within
 # latest_GE     - what is the latest protonGE version we have?
