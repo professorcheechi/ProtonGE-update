@@ -92,7 +92,7 @@ local_files_check()
   # make sure we can write to both dir
   if [[ "$noGEproton" -ne 1 ]]; then
     ls -lrt $mydl | grep -w protonGE | grep -q "drwx" || exit_state=4
-    ls -lrt $comptoolsdir | grep -q "drwx" || exit_state=4
+    ls -lrt ~/.steam/root/ | grep -w compatibilitytools.d | grep -q "drwx" || exit_state=4
   fi
 
   # verbose output whether checking or installing files
