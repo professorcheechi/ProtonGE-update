@@ -98,7 +98,7 @@ local_files_check()
   # verbose output whether checking or installing files
   # exit if only checking
   printf "\n $mydl/protonGE \n\n"
-  dl_files=$(ls -lrt $mydl/protonGE | grep -w "protonGE ")
+  dl_files=$(ls -lrt $mydl/protonGE | grep "GE-Proton")
   echo "$dl_files" 
 
   printf "\n $comptoolsdir \n\n"
@@ -151,19 +151,34 @@ remote_files_check()
 get_new_protonGE()
 {
   # download  tarball
+  printf " Downloading $latest_GE.tar.gz ..."
   curl -sLOJ $(curl -s $protonGE_url | grep browser_download_url | cut -d\" -f4 | grep -E .tar.gz)
+  printf "Done \n"
 
   # download checksum
+  printf " Downloading $latest_GE.sha512sum ..."
   curl -sLOJ $(curl -s $protonGE_url | grep browser_download_url | cut -d\" -f4 | grep -E .sha512sum)
+  printf "Done \n"
 }
+
 
 check_tarball()
 {
   # check tarball with checksum
+  printf " Verifying downloaded file ..."
   sha512sum -c $latest_GE.sha512sum | grep -q "OK" && shaOK=1
+  if  [[ "$shaOK" -eq 1 ]]; then
+    printf "Done \n"
+  elif [[ "$checksumretries" -lt 3 ]]; then
+    printf "validation failed downloading again \n"
+  else
+    printf "Too many failures! \ 
+             Github limits bandwitdh do some troubleshooting before trying again \n"
+  fi
 
   checksumtries=$(( $checksumtries + 1 ))
 }
+
 
 install_protonGE()
 {
