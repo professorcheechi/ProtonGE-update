@@ -29,22 +29,10 @@ usage()
   printf "\n\n This script is an expansion and automation of the instructions provided at the Proton GE github page \
           \n\n https://github.com/GloriousEggroll/proton-ge-custom \
           \n\n The purpose is to automate the installation steps and if needed help diagnose install isssues. \
-          \n It needs no flags or arguments, the only flag is -h to display this help message \n\n"
+          \n The following flags can be used: \ 
+          \n\t -h Display this help message \ 
+          \n\t -v Only check for the latest version \n\n"
 }
-
-#version_check_only()
-#{
-#  if [ -d "$comptoolsdir" ]; then
-#    # check the existing installed version
-#    current_GE=$(ls -lrt $comptoolsdir | grep GE-Proton | tail -1 | awk '{print $9}')
-#    printf "\n Installed version is $current_GE \n"
-#  else 
-#    printf "\n No Proton GE installed \n\n"
-#  fi
-#  # check current version available
-#  latest_GE=$(curl -s $protonGE_url -- list-only | grep "tag_name" | awk '{print $NF}' | tr -d '",')
-#  printf "\n Latest version is $latest_GE \n\n"
-#}
 
 exit_clean()
 { # Assumption: any step that fails will provide some output along the way to assist with troubleshooting
